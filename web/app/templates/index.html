@@ -1,0 +1,33 @@
+<html>
+    <header>
+        <title> Visualizing COVID-19 </title>
+        <link href="https://stackpath.bootstrapcdn.com/bootswatch/4.4.1/flatly/bootstrap.min.css" rel="stylesheet" integrity="sha384-yrfSO0DBjS56u5M+SjWTyAHujrkiYVtRYh2dtB3yLQtUz3bodOeialO59u5lUCFF" crossorigin="anonymous">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/index.css') }}">
+    </header>
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <h1>Visualizing COVID-19</h1>
+                    <h6>Last Update: {{ last_update }}</h6>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="embed-responsive embed-responsive-6by7">
+                        <iframe class="embed-responsive-item" src="https://datastudio.google.com/embed/reporting/6b6b3b59-cff2-48ed-9cde-a43f181ea7b3/page/Y5rIB"></iframe>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <h5><b>Sources</b></h5>
+                    {% for source in sources %}
+                    <h5><a href="{{ source }}">{{ source }}</a></h5>
+                    {% endfor %}
+                    <h5></h5>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,19 @@
+steps:
+    # build, push, and deploy web
+    - name: "gcr.io/cloud-builders/docker"
+      args: ["build", "-t", "${_WEB_IMAGE}", "./web"]
+    - name: "gcr.io/cloud-builders/docker"
+      args: ["push", "${_WEB_IMAGE}"]
+    - name: "gcr.io/cloud-builders/gcloud"
+      args: ["compute", "instances", "update-container", "web-instance-1", "--zone", "us-east1-b", "--container-image", "${_WEB_IMAGE}"]
+    # build, push, and deploy nginx
+    - name: "gcr.io/cloud-builders/docker"
+      args: ["build", "-t", "${_NGINX_IMAGE}", "./nginx"]
+    - name: "gcr.io/cloud-builders/docker"
+      args: ["push", "${_NGINX_IMAGE}"]
+    - name: "gcr.io/cloud-builders/gcloud"
+      args: ["compute", "instances", "update-container", "nginx-instance-1", "--zone", "us-east1-b", "--container-image", "${_NGINX_IMAGE}"]
+substitutions: 
+    _WEB_IMAGE: "gcr.io/covid19-data-pipeline/web:latest"
+    _NGINX_IMAGE: "gcr.io/covid19-data-pipeline/nginx:latest"
+images: ['${_WEB_IMAGE}', '${_NGINX_IMAGE}']

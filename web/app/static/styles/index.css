@@ -1,0 +1,13 @@
+html, body {
+    padding: 20px;
+    height: 100%;
+}
+
+.embed-responsive-6by7 {
+    padding-bottom: 120%;
+}
+
+.row:last-child {
+    margin-top: 60px;
+    margin-bottom: 70px;
+}

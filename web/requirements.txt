@@ -1,0 +1,9 @@
+Flask
+gunicorn
+google-cloud-bigquery
+google-cloud-logging
+pandas
+pyarrow
+grpcio
+country_converter
+bs4
