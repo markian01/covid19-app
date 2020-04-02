@@ -61,7 +61,8 @@ def update_source():
 
         BASE_URL = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/{}'
         FILES = [('confirmed', 'time_series_covid19_confirmed_global.csv'), 
-                 ('deaths', 'time_series_covid19_deaths_global.csv')]
+                 ('deaths', 'time_series_covid19_deaths_global.csv'),
+                 ('recovered', 'time_series_covid19_recovered_global.csv')]
         
         # Helper for update-source endpoint
         logger = Logger('update-source')
@@ -173,27 +174,27 @@ def update_output():
                 daily_stats.*,
                 if(prev_confirmed > 0, round(confirmed_growth / prev_confirmed, 2), null) as confirmed_growth_rate,
                 if(prev_deaths > 0, round(deaths_growth / prev_deaths, 2), null) as deaths_growth_rate,
-                # if(prev_recovered > 0, round(recovered_growth / prev_recovered, 2), null) as recovered_growth_rate,
-                # if(prev_live_cases != 0, round(live_cases_growth / prev_live_cases, 2), null) as live_cases_growth_rate,
+                if(prev_recovered > 0, round(recovered_growth / prev_recovered, 2), null) as recovered_growth_rate,
+                if(prev_live_cases != 0, round(live_cases_growth / prev_live_cases, 2), null) as live_cases_growth_rate,
                 population,
                 confirmed_growth / population * 1000000 as confirmed_growth_per_million,
                 deaths_growth / population * 1000000 as deaths_growth_per_million,
-                # recovered_growth / population * 1000000 as recovered_growth_per_million
+                recovered_growth / population * 1000000 as recovered_growth_per_million
             from (
                 select
                     *,
                     confirmed - prev_confirmed as confirmed_growth,
                     deaths - prev_deaths as deaths_growth,
-                    # recovered - prev_recovered as recovered_growth,
-                    # live_cases - prev_live_cases as live_cases_growth
+                    recovered - prev_recovered as recovered_growth,
+                    live_cases - prev_live_cases as live_cases_growth
                 from (
                     select
                         *,
-                        # confirmed - (deaths + recovered) as live_cases,
+                        confirmed - (deaths + recovered) as live_cases,
                         COALESCE(lag(confirmed) over(partition by country_region, province_state order by date), 0) as prev_confirmed,
                         COALESCE(lag(deaths) over(partition by country_region, province_state order by date), 0) as prev_deaths,
-                        # COALESCE(lag(recovered) over(partition by country_region, province_state order by date), 0) as prev_recovered,
-                        # COALESCE(lag(confirmed - (deaths + recovered)) over(partition by country_region, province_state order by date), 0) as prev_live_cases
+                        COALESCE(lag(recovered) over(partition by country_region, province_state order by date), 0) as prev_recovered,
+                        COALESCE(lag(confirmed - (deaths + recovered)) over(partition by country_region, province_state order by date), 0) as prev_live_cases
                     from
                         `source_dataset.daily_stats`)) as daily_stats
             join
@@ -228,8 +229,8 @@ def update_output():
                     date,
                     sum(confirmed) as confirmed,
                     sum(deaths) as deaths,
-                    # sum(recovered) as recovered,
-                    # sum(live_cases) as live_cases,
+                    sum(recovered) as recovered,
+                    sum(live_cases) as live_cases,
                 from
                     `output_dataset.daily_stats`
                 group by
